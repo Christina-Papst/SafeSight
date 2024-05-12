@@ -1,10 +1,3 @@
-# this is the function that classifies the images
-
-import torch
-import PIL
-from PIL import Image
-import numpy as np
-
 def classify_image(image_path):
     
     # Load the image
@@ -61,9 +54,14 @@ def classify_image(image_path):
         logits = model(**inputs).logits
 
     predicted_emotion = logits.argmax(-1).item()
-    
 
-    # show the results in all three categories
-    print("Safe or unsafe for work:", predicted_class)
-    print("Predicted age ranges:", predicted_age_ranges)
-    print("The most prevalent emotion is", model.config.id2label[predicted_emotion])
+    # Check if NSFW and age is less than 20
+    if predicted_class == "nsfw" and any(age_range in ["0-2", "3-9", "10-19"] for age_range in predicted_age_ranges):
+    # Copy the image to the flagged folder
+        shutil.copy2(image_path, directory="flagged_images")
+   
+    nsfw_negative_emotions = ["sad", "disgust", "angry", "fear"]  # List of negative emotions
+
+    if predicted_class == "nsfw" and any(predicted_emotion == emotion for emotion in nsfw_negative_emotions):
+    # Copy the image to the flagged folder
+        shutil.copy2(image_path, flagged_folder_path)
