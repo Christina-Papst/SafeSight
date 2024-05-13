@@ -72,24 +72,19 @@ def download_images(url, directory="scraped_images"):
         filename = hashlib.sha256(image_url.encode('utf-8')).hexdigest()[:10] + ".jpg"
 
         # Save the image
-        try:
-            with requests.get(image_url, stream=True) as image_response:
-                if image_response.status_code == 200:
-                    with open(os.path.join(directory, filename), 'wb') as file:
-                        for chunk in image_response.iter_content(1024):
-                            file.write(chunk)
+        with requests.get(image_url, stream=True) as image_response:
+            if image_response.status_code == 200:
+                with open(os.path.join(directory, filename), 'wb') as file:
+                    for chunk in image_response.iter_content(1024):
+                        file.write(chunk)
     
-        except PermissionError:
-            print(f"Permission denied for {os.path.join(directory, filename)}. Skipping...")
-            continue
+
     
 
 
 
 def rate_images(url, directory="scraped_images"):
-    # Create directories if they don't exist
-    os.makedirs("scraped_images", exist_ok=True)
-    os.makedirs("flagged_images", exist_ok=True)
+
 
     # Download images
     # Download images
@@ -99,7 +94,7 @@ def rate_images(url, directory="scraped_images"):
     # Process each image in the directory
     for filename in os.listdir(directory):
         image_path = os.path.join(directory, filename)
-        img = PIL.Image.open(image_path).convert("RGB")
+        img = PIL.Image.open(image_path)
     
         # Process the image and make predictions if the image is nsfw
         with torch.no_grad():
@@ -171,25 +166,11 @@ def rate_images(url, directory="scraped_images"):
     
             # Print the results
         
-        st.text(" ")
-        st.text(f"Image: {filename}")
-        st.text(f"Safe or unsafe for work: {predicted_class}")
-        st.text(f"Predicted age ranges: {predicted_age_ranges}")
-        st.text(f"The most prevalent emotion is {model.config.id2label[predicted_emotion]}")
-        st.text(" ")
+        print(f"Image: {filename}")
+        print("Safe or unsafe for work:", predicted_class)
+        print("Predicted age ranges:", predicted_age_ranges)
+        print("The most prevalent emotion is", model.config.id2label[predicted_emotion])
 
+url = "https://www.freepik.com/free-photos-vectors/sexy-fantasy"
 
-st.title("SafeSight")
-st.text(" ")
-st.text("Check if the images of a website contain child pornography or images of a sexually violent nature.")
-st.text("If you find any materials of such a nature, please contact your local police or center for cybercrime immediately.")
-st.text("This program uses artificial intelligence.")
-st.text("While AI is a powerful tool in the fight against cybercrime, it cannot replace your own, natural intelligence.")
-st.text("Always double-check the results")
-st.text(" ")
-url = st.text_input("Please enter the url you want to investigate:")
-
-enter = st.button("Enter")
-if enter:
-  rate_images(url, directory="scraped_images")
-
+rate_images(url, directory="scraped_images")
