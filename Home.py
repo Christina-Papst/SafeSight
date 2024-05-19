@@ -29,7 +29,7 @@ transforms = ViTFeatureExtractor.from_pretrained('nateraw/vit-age-classifier')
 
 
 # Create a list of fake user agents
-SCRAPEOPS_API_KEY = '0e81eee1-3ea8-4fcd-95fd-cbc2ef81daee'
+SCRAPEOPS_API_KEY = 'ENTER YOUR OWN API KEY FROM SCRAPEOPS'
 
 
 def get_user_agent_list():
